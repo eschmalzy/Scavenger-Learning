@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# This script belongs in ai/bin.
+# It must be run from the same diretory.
+# You must configure the script to run correctly.
+
+#
+# Sample script to run the Scavenger World for the
+# statistical learning environment
+#
+#
+
+# number of agents in simulation, if you increase this value
+# you will have to add code to launch the additional agent programs
+agent_count=1                  
+# number of seconds between moves.  Must be an integer
+delay_between_moves=0
+# Non-zero to show the display
+do_display=0
+# The path to the world file, relative to the directory where the server will run
+world_file=y13m11d18p01-small-learning-world.txt
+# The number of objects to not score based on learning.
+unscored_object_count=100
+# Maximum number of objects in the hopper to consider for scoring.
+# The actual number used for scoring is reduced by the number skipped
+# for learning.
+maximum_objects_in_score=1000  
+# Non-zero to use statistical learning mode.
+object_learning=1
+# YOU choose a different port!
+port=4321
+# The number of simulations to run.  Unless there is a stochastic element,
+# one run is sufficient
+run_count=1
+# This environment has no stochastic elements, so the seed is not important.
+seed="--seed 2817239181" 
+# Number of seconds to pause after each run.  Useful to examine the
+# display after a game has finished.
+pause_after_game=1
+# Maximum number of actions by the agent before the simulation is
+# completed.  Needs to be tuned to disallow infinite activity, but
+# allow long action sequences.
+maximum_steps_per_game=20000
+# Non-zero to have the server display trace information
+env_trace=0
+# Allow near-infinite volume hopper
+maximum_hopper_volume=1000000000
+
+
+# YOU change this letter to match the one you put in AgentPrograms.pm.
+player_one="l"
+player_one_trace="1"
+player_one_args=""
+
+# This runs the optimized version of your code.  Change the directory
+# below to run the debugging verion.
+player_one_dir=00bin-o
+player_one_prog=SA_Test
+player_one_options="--agent ${player_one} --port ${port} --trace ${player_one_trace} ${player_one_args}"
+
+# Always runs the optimized version of the server
+env_dir=00bin-o
+env_prog=ScavengerServer
+env_options="--agents ${agent_count} --delay ${delay_between_moves} --displays ${do_display} --filename ${env_dir}/${world_file} --fully-observable 0 --max-object-count ${maximum_objects_in_score} --object-learning ${object_learning} --port ${port} --runs ${run_count} ${seed} --skip-object-count ${unscored_object_count} --sleep ${pause_after_game} --steps ${maximum_steps_per_game} --tourney 0 --trace ${env_trace} --max-hopper-volume ${maximum_hopper_volume}"
+
+# Always runs the optimized version of the display
+display_dir=00bin-o
+display_prog=ScavengerDisplay
+display_options="--port ${port}"
+
+# Actually run the programs
+${env_dir}/RunProg ${env_dir}/${env_prog} ${env_options} &
+sleep 2
+if [ "${do_display}" != "0" ]; then
+    ${display_dir}/RunProg ${display_dir}/${display_prog} ${display_options} &
+fi
+${player_one_dir}/RunProg ${player_one_dir}/${player_one_prog} ${player_one_options}

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#
+# Run this in ai/bin/00bin-o
+#
+if [ ! -x ScavengerServer ]; then
+    echo "ScavengerServer is missing"
+    exit 1
+fi
+if [ ! -x ScavengerDisplay ]; then
+    echo "ScavengerDisplay is missing"
+    exit 1
+fi
+if [ ! -x ScavengerAgent ]; then
+    echo "ScavengerAgent is missing"
+    exit 1
+fi
+
+# Launch the game server
+world_file=../ScavengerWorlds/worlds-2016/online-worlds/y16m11d28p03-online-large-world.txt
+./ScavengerServer -d 0 -s 20000 -O 0 -f ${world_file} -R 1 >server.log 2>server.err &
+echo "Waiting for server to get started"
+sleep 2
+
+# Launch the display
+./ScavengerDisplay -d 0 >display.log 2>display.err &
+#./ScavengerDisplay >display.log 2>display.err &
+
+# Launch the agent player
+./ScavengerAgent -a s -t 0 >agent1.log 2>agent1.err 
+
+
